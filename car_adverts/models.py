@@ -2,10 +2,7 @@ from django.db import models
 
 
 class City(models.Model):
-    title = models.CharField(
-        verbose_name="название города",
-        unique=True
-    )
+    title = models.CharField(verbose_name="название города", unique=True)
 
     class Meta:
         ordering = ("id",)
@@ -14,26 +11,18 @@ class City(models.Model):
 
 
 class Advert(models.Model):
-    price = models.PositiveBigIntegerField(
-        verbose_name="цена"
-    )
-    description = models.TextField(
-        verbose_name="описание"
-    )
-    title = models.CharField(
-        verbose_name="название",
-        max_length=200
-    )
+    price = models.PositiveBigIntegerField(verbose_name="цена")
+    description = models.TextField(verbose_name="описание")
+    title = models.CharField(verbose_name="название", max_length=200)
     year_of_issue = models.PositiveIntegerField(
         verbose_name="год выпуска"
     )
-    characteristics = models.JSONField(
-        verbose_name="характеристики"
-    )
+    characteristics = models.JSONField(verbose_name="характеристики")
     city_id = models.ForeignKey(
-        to=City, on_delete=models.CASCADE,
+        to=City,
+        on_delete=models.CASCADE,
         related_name="city_adverts",
-        verbose_name="город"
+        verbose_name="город",
     )
 
     class Meta:
@@ -47,13 +36,13 @@ class Advert(models.Model):
 
 class AdvertImage(models.Model):
     image = models.ImageField(
-        upload_to="advert_images",
-        verbose_name="изображение"
+        upload_to="advert_images", verbose_name="изображение"
     )
     advert_id = models.ForeignKey(
-        to=Advert, on_delete=models.CASCADE,
+        to=Advert,
+        on_delete=models.CASCADE,
         related_name="advert_images",
-        verbose_name="объявление"
+        verbose_name="объявление",
     )
 
     class Meta:

@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from car_adverts.models import City, Advert, AdvertImage
+
+
+admin.site.register((City, Advert, AdvertImage))
