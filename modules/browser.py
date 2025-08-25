@@ -3,27 +3,28 @@ import time
 from playwright.sync_api import sync_playwright
 from loguru import logger
 
-# from modules.scripts import GET_AREAS
+from modules.scripts import GET_AREAS
 
 
-GET_AREAS = """
-const regions = [];
+# GET_AREAS = """
+# const regions = [];
 
-window.document.querySelectorAll('li[data-test="filter-region-item"]').forEach(li => {
-    const btn = li.querySelector('button');
-    const alias = btn?.getAttribute('data-alias');
-    const label = li.querySelector('span[data-test="filter-item-label"]')?.textContent.trim();
+# window.document.querySelectorAll('li.filter-region__item').forEach(li => {
+#     const btn = li.querySelector('button');
+#     const alias = btn.getAttribute('data-alias');
+#     const label = li.innerText;
 
-    if (label) {
-        regions.push({ alias, label });
-    }
-});
-regions;
-"""
+#     if (label) {
+#         regions.push({ alias, label });
+#     }
+# });
+# regions;
+# """
 
 
 class ChromeBrowser:
     def __init__(self, headless: bool = True):
+        self.base_url = "https://kolesa.kz/cars/"
         self.headless = headless
         self.playwright = None
         self.browser = None
@@ -51,8 +52,8 @@ class ChromeBrowser:
             self.playwright.stop()
         logger.info("Browser closed")
 
-    def start_parsing(self, url: str):
-        self.page.goto(url=url)
+    def get_cities(self):
+        self.page.goto(url=self.base_url)
         # more_btn = self.page.locator(selector=".FilterGroup__toggle")
         # self.page.evaluate(
         #     expression="window.document.querySelector('.FilterGroup__toggle').click()"
@@ -62,12 +63,12 @@ class ChromeBrowser:
             btn.click()
         else:
             logger.error("Кнопки нет")
+        time.sleep(3)
         # temp = self.page.wait_for_selector(selector=".filter-region__item")
         cities_block = self.page.evaluate(expression=GET_AREAS)
-        breakpoint()
-        time.sleep(30)
+        return cities_block
 
 
 if __name__ == "__main__":
     with ChromeBrowser(headless=False) as browser:
-        browser.start_parsing(url="https://kolesa.kz/cars/astana/")
+        browser.get_cities()
