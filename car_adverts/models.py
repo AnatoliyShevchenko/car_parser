@@ -3,7 +3,7 @@ from django.db import models
 
 class City(models.Model):
     title = models.CharField(verbose_name="название города", unique=True)
-
+    alias = models.CharField(verbose_name="url параметр", default="")
     class Meta:
         ordering = ("id",)
         verbose_name = "город"
