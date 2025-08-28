@@ -4,7 +4,7 @@ from django.db import models
 class City(models.Model):
     title = models.CharField(verbose_name="название города", unique=True)
     alias = models.CharField(verbose_name="url параметр", default="")
-    
+
     class Meta:
         ordering = ("id",)
         verbose_name = "город"
@@ -12,18 +12,29 @@ class City(models.Model):
 
 
 class Advert(models.Model):
-    price = models.PositiveBigIntegerField(verbose_name="цена")
-    description = models.TextField(verbose_name="описание")
-    title = models.CharField(verbose_name="название", max_length=200)
-    year_of_issue = models.PositiveIntegerField(
-        verbose_name="год выпуска"
+    price = models.PositiveBigIntegerField(
+        verbose_name="цена", null=True, blank=True
     )
-    characteristics = models.JSONField(verbose_name="характеристики")
+    description = models.TextField(
+        verbose_name="описание", null=True, blank=True
+    )
+    title = models.CharField(
+        verbose_name="название", max_length=200, null=True, blank=True
+    )
+    year_of_issue = models.PositiveIntegerField(
+        verbose_name="год выпуска", null=True, blank=True
+    )
+    characteristics = models.JSONField(
+        verbose_name="характеристики", null=True, blank=True
+    )
     city_id = models.ForeignKey(
         to=City,
         on_delete=models.CASCADE,
         related_name="city_adverts",
         verbose_name="город",
+    )
+    publication_date = models.DateField(
+        verbose_name="дата публикации", null=True, blank=True
     )
 
     class Meta:

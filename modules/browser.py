@@ -3,23 +3,35 @@ import time
 from playwright.sync_api import sync_playwright
 from loguru import logger
 
-from modules.scripts import GET_AREAS
+# from modules.scripts import GET_AREAS
 
 
-# GET_AREAS = """
-# const regions = [];
+GET_AREAS = """
+const regions = [];
 
-# window.document.querySelectorAll('li.filter-region__item').forEach(li => {
-#     const btn = li.querySelector('button');
-#     const alias = btn.getAttribute('data-alias');
-#     const label = li.innerText;
+window.document.querySelectorAll('li.filter-region__item').forEach(li => {
+    const btn = li.querySelector('button');
+    const alias = btn.getAttribute('data-alias');
+    const label = li.innerText;
 
-#     if (label) {
-#         regions.push({ alias, label });
-#     }
-# });
-# regions;
-# """
+    if (label) {
+        regions.push({ alias, label });
+    }
+});
+regions;
+"""
+
+GET_ADVERTS_LIST = """
+const adverts = [];
+
+window.document.querySelectorAll(".a-card.js__a-card").forEach(advert => {
+    const advertId = advert.getAttribute("data-id");
+    if (advertId) {
+        adverts.push(advert_id);
+    }
+})
+adverts;
+"""
 
 
 class ChromeBrowser:
@@ -66,6 +78,7 @@ class ChromeBrowser:
         time.sleep(3)
         # temp = self.page.wait_for_selector(selector=".filter-region__item")
         cities_block = self.page.evaluate(expression=GET_AREAS)
+        logger.info(f"Cities block: {cities_block}")
         return cities_block
 
 
