@@ -27,7 +27,7 @@ class Advert(models.Model):
     characteristics = models.JSONField(
         verbose_name="характеристики", null=True, blank=True
     )
-    city_id = models.ForeignKey(
+    city = models.ForeignKey(
         to=City,
         on_delete=models.CASCADE,
         related_name="city_adverts",
@@ -43,14 +43,14 @@ class Advert(models.Model):
         verbose_name_plural = "объявления"
 
     def __str__(self):
-        return f"{self.title} -> {self.year_of_issue} -> {self.city_id}"
+        return f"{self.title} -> {self.year_of_issue} -> {self.city}"
 
 
 class AdvertImage(models.Model):
     image = models.ImageField(
         upload_to="advert_images", verbose_name="изображение"
     )
-    advert_id = models.ForeignKey(
+    advert = models.ForeignKey(
         to=Advert,
         on_delete=models.CASCADE,
         related_name="advert_images",
@@ -63,4 +63,4 @@ class AdvertImage(models.Model):
         verbose_name_plural = "изображения"
 
     def __str__(self):
-        return f"{self.pk} -> {self.advert_id}"
+        return f"{self.pk} -> {self.advert}"

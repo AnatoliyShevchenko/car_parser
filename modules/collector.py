@@ -7,6 +7,9 @@ from bs4 import BeautifulSoup, Tag
 from loguru import logger
 from fake_useragent import UserAgent
 
+from car_adverts.models import Advert
+
+
 MONTHS = {
     "января": 1,
     "февраля": 2,
@@ -45,17 +48,19 @@ class AdvertsCollector:
         soup = BeautifulSoup(markup=content)
         car_list: list[Tag] = soup.find_all(
             name="div",
-            attrs={"class": "a-card js__a-card"},
+            attrs={"class": "a-list__item"},
         )
         adverts = []
+        breakpoint()
         for item in car_list:
-            advert_id: str = item.attrs.get("data-id")
-            public_date: str = item.find(
+            card = item.find(name="div", attrs={"class": "a-card js__a-card"})
+            advert_id: str = card.attrs.get("data-id")
+            public_date: str = card.find(
                 name="span",
-                attrs={"class": "a-card__param a-card__param--date"},
-            ).get_text()
+                attrs={"class": "a-card__param--date"},
+            )
             try:
-                day, month = public_date.split(" ")
+                day, month = public_date.get_text().split(" ")
             except Exception as e:
                 logger.debug(f"Something went wrong: {e}")
                 continue
@@ -71,10 +76,12 @@ class AdvertsCollector:
 
     def run(self):
         adverts = []
+        page = 1
+        no_data_counter = 0
         while True:
-            page = 1
             self.headers["user-agent"] = UserAgent().random
-            url = f"{self.base_url}{self.city}/?page={page}"
+            page_arg = "" if page == 1 else f"?page={page}"
+            url = f"{self.base_url}{self.city}/{page_arg}"
             try:
                 logger.debug(f"Make request url: {url}")
                 response = requests.get(url=url, headers=self.headers)
@@ -84,21 +91,19 @@ class AdvertsCollector:
                 return
             content = response.content
             if not content:
+                logger.debug("There are no content")
                 continue
+            page += 1
+            if page > 5:
+                break
             data = self.data_processing(content=content)
             if not data:
-                break
+                no_data_counter += 1
+                logger.debug(f"There are no data, counter is {no_data_counter}")
+                if no_data_counter > 3:
+                    break
             adverts.extend(data)
-            page += 1
-            delay = random.randint(3, 6)
+            delay = random.randint(6, 10)
             logger.debug(f"Sleep for {delay} seconds")
-            time.sleep(random.randint(3, 6))
+            time.sleep(delay)
         return adverts
-
-
-if __name__ == "__main__":
-    collector = AdvertsCollector(
-        date=date(year=2025, month=8, day=28),
-        city_alias="region-karagandinskaya-oblast",
-    )
-    logger.info(f"Data: {collector.run()}")

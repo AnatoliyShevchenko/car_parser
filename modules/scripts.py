@@ -12,3 +12,30 @@ window.document.querySelectorAll('li.filter-region__item').forEach(li => {
 });
 regions;
 """
+GET_ADVERTS_IDS = """
+const ids = [];
+
+window.document.querySelectorAll(
+'.a-card.js__a-card'
+).forEach(advert => {
+    const id = advert.getAttribute("data-id");
+    if (id) {
+        ids.push(id);
+    }
+})
+ids;
+"""
+GET_ADVERTS_DATES = """
+const dates = [];
+
+window.document.querySelectorAll(
+'div.a-card__info > div.a-card__footer > div.a-card__data > span.a-card__param.a-card__param--date'
+).forEach(advert => {
+    const date = advert.innerText;
+    if (date) {
+        dates.push(date);
+    }
+})
+dates;
+"""
+

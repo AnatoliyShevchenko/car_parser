@@ -1,37 +1,26 @@
 import time
+from datetime import datetime, date
 
 from playwright.sync_api import sync_playwright
 from loguru import logger
 
-# from modules.scripts import GET_AREAS
+from modules.scripts import GET_AREAS, GET_ADVERTS_DATES, GET_ADVERTS_IDS
 
 
-GET_AREAS = """
-const regions = [];
-
-window.document.querySelectorAll('li.filter-region__item').forEach(li => {
-    const btn = li.querySelector('button');
-    const alias = btn.getAttribute('data-alias');
-    const label = li.innerText;
-
-    if (label) {
-        regions.push({ alias, label });
-    }
-});
-regions;
-"""
-
-GET_ADVERTS_LIST = """
-const adverts = [];
-
-window.document.querySelectorAll(".a-card.js__a-card").forEach(advert => {
-    const advertId = advert.getAttribute("data-id");
-    if (advertId) {
-        adverts.push(advert_id);
-    }
-})
-adverts;
-"""
+MONTHS = {
+    "января": 1,
+    "февраля": 2,
+    "марта": 3,
+    "апреля": 4,
+    "мая": 5,
+    "июня": 6,
+    "июля": 7,
+    "августа": 8,
+    "сентября": 9,
+    "октября": 10,
+    "ноября": 11,
+    "декабря": 12,
+}
 
 
 class ChromeBrowser:
@@ -81,7 +70,28 @@ class ChromeBrowser:
         logger.info(f"Cities block: {cities_block}")
         return cities_block
 
-
-if __name__ == "__main__":
-    with ChromeBrowser(headless=False) as browser:
-        browser.get_cities()
+    def get_adverts(self, city_alias: str, parse_date: date):
+        data = {}
+        page = 1
+        while True:
+            page_arg = "" if page == 1 else f"?page={page}"
+            url = f"{self.base_url}{city_alias}/{page_arg}"
+            self.page.goto(url=url)
+            ids = self.page.evaluate(expression=GET_ADVERTS_IDS)
+            dates = self.page.evaluate(expression=GET_ADVERTS_DATES)
+            for i, item in enumerate(ids):
+                temp: str = dates[i]
+                day, month = temp.split(" ")
+                date_to_compare = date(
+                    year=datetime.now().year,
+                    month=MONTHS.get(month),
+                    day=int(day),
+                )
+                if date_to_compare < parse_date:
+                    continue
+                data[int(item)] = date_to_compare
+            page += 1
+            if page > 5:
+                break
+            time.sleep(5)
+        return data
