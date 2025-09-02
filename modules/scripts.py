@@ -39,3 +39,30 @@ window.document.querySelectorAll(
 dates;
 """
 
+GET_TITLE = """
+let title = window.document.querySelector("[itemprop='brand'").innerText;
+title;
+"""
+GET_DESCR = """
+let descr = window.document.querySelector(".a-description__text").innerText;
+descr;
+"""
+GET_YEAR = """
+let year = window.document.querySelector("span.year").innerText;
+year;
+"""
+GET_CHARS = """
+const params = {};
+document.querySelectorAll(".offer__parameters dl").forEach(dl => {
+  const key = dl.querySelector("dt")?.innerText.trim().replace(/\u00a0/g, " ");
+  const value = dl.querySelector("dd")?.innerText.trim();
+  if (key && value) {
+    params[key] = value;
+  }
+});
+params;
+"""
+GET_PRICE = """
+let price = window.document.querySelector(".offer__price").innerText;
+price;
+"""

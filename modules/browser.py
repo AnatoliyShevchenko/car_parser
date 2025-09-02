@@ -4,7 +4,16 @@ from datetime import datetime, date
 from playwright.sync_api import sync_playwright
 from loguru import logger
 
-from modules.scripts import GET_AREAS, GET_ADVERTS_DATES, GET_ADVERTS_IDS
+from modules.scripts import (
+    GET_AREAS,
+    GET_ADVERTS_DATES,
+    GET_ADVERTS_IDS,
+    GET_CHARS,
+    GET_DESCR,
+    GET_PRICE,
+    GET_TITLE,
+    GET_YEAR,
+)
 
 
 MONTHS = {
@@ -95,3 +104,20 @@ class ChromeBrowser:
                 break
             time.sleep(5)
         return data
+
+    def get_full_data(self, advert_id: int):
+        url = f"https://kolesa.kz/a/show/{advert_id}"
+        self.page.goto(url=url)
+        title = self.page.evaluate(expression=GET_TITLE)
+        year_of_issue = self.page.evaluate(expression=GET_YEAR)
+        description = self.page.evaluate(expression=GET_DESCR)
+        characteristics = self.page.evaluate(expression=GET_CHARS)
+        temp_price: str | None = self.page.evaluate(expression=GET_PRICE)
+        price = temp_price.split(" ")[0].replace("\xa0", "")
+        return {
+            "title": title,
+            "year_of_issue": int(year_of_issue),
+            "description": description,
+            "characteristics": characteristics,
+            "price": int(price)
+        }
