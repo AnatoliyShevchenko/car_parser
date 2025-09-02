@@ -1,3 +1,5 @@
+import time
+
 from loguru import logger
 from django.core.management.base import BaseCommand
 
@@ -17,7 +19,18 @@ class Command(BaseCommand):
             logger.info("There are no adverts to processing")
             return
         logger.info(f"Founded {len(adverts)} adverts")
+        items = []
+        fields = []
         for advert in adverts:
+            time.sleep(5)
             data = self.processing(advert_id=advert.pk)
             if not data:
                 continue
+            for key, value in data.items():
+                setattr(advert, key, value)
+            if not fields:
+                for key in data.keys():
+                    fields.append(key)
+            items.append(advert)
+        logger.info(f"Fields for update: {','.join(fields)}")
+        Advert.objects.bulk_update(objs=items, fields=fields)
