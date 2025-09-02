@@ -9,7 +9,7 @@ from car_adverts.models import Advert
 
 class Command(BaseCommand):
     def processing(self, advert_id: int):
-        with ChromeBrowser(headless=False) as browser:
+        with ChromeBrowser() as browser:
             data = browser.get_full_data(advert_id=advert_id)
         return data
 

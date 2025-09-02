@@ -121,3 +121,8 @@ class ChromeBrowser:
             "characteristics": characteristics,
             "price": int(price)
         }
+
+    def collect_links(self, advert_id: int):
+        url = f"https://kolesa.kz/a/show/{advert_id}"
+        self.page.goto(url=url)
+        ### Получаете все ссылки на изображения
