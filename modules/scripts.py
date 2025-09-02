@@ -66,3 +66,12 @@ GET_PRICE = """
 let price = window.document.querySelector(".offer__price").innerText;
 price;
 """
+
+GET_IMAGES = """
+let urls = [];
+window.document.querySelectorAll("button.gallery__thumb-image").forEach(element => {
+    let photoUrl = element.getAttribute("data-href");
+    urls.push(photoUrl);
+});
+urls;
+"""

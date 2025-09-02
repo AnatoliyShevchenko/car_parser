@@ -13,6 +13,7 @@ from modules.scripts import (
     GET_PRICE,
     GET_TITLE,
     GET_YEAR,
+    GET_IMAGES,
 )
 
 
@@ -105,14 +106,22 @@ class ChromeBrowser:
             time.sleep(5)
         return data
 
+    def run_script(self, expression: str):
+        try:
+            data = self.page.evaluate(expression=expression)
+            return data
+        except Exception as e:
+            logger.error(f"Cannot execute script: {e}")
+            return None
+
     def get_full_data(self, advert_id: int):
         url = f"https://kolesa.kz/a/show/{advert_id}"
         self.page.goto(url=url)
-        title = self.page.evaluate(expression=GET_TITLE)
-        year_of_issue = self.page.evaluate(expression=GET_YEAR)
-        description = self.page.evaluate(expression=GET_DESCR)
-        characteristics = self.page.evaluate(expression=GET_CHARS)
-        temp_price: str | None = self.page.evaluate(expression=GET_PRICE)
+        title = self.run_script(expression=GET_TITLE)
+        year_of_issue = self.run_script(expression=GET_YEAR)
+        description = self.run_script(expression=GET_DESCR)
+        characteristics = self.run_script(expression=GET_CHARS)
+        temp_price: str | None = self.run_script(expression=GET_PRICE)
         price = temp_price.split(" ")[0].replace("\xa0", "")
         return {
             "title": title,
@@ -122,7 +131,8 @@ class ChromeBrowser:
             "price": int(price)
         }
 
-    def collect_links(self, advert_id: int):
+    def collect_links(self, advert_id: int) -> list[str] | None:
         url = f"https://kolesa.kz/a/show/{advert_id}"
         self.page.goto(url=url)
-        ### Получаете все ссылки на изображения
+        links = self.run_script(expression=GET_IMAGES)
+        return links

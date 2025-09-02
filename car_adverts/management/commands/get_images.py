@@ -1,7 +1,10 @@
+import uuid
+import time
+
 from loguru import logger
 from django.core.management.base import BaseCommand
 import requests
-from PIL import Image
+from django.core.files.base import ContentFile
 
 from modules.browser import ChromeBrowser
 from car_adverts.models import Advert, AdvertImage
@@ -24,10 +27,12 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         adverts = Advert.objects.filter(advert_images__isnull=True)
-        for advert in adverts[:5]:
+        for advert in adverts:
+            time.sleep(5)
             links = self.get_data(advert_id=advert.pk)
             for link in links:
                 img_bytes = self.processing_link(link=link)
                 if not img_bytes:
                     continue
-                image = Image.open(img_bytes)
+                img_file = ContentFile(content=img_bytes, name=f"{uuid.uuid4()}.jpg")
+                AdvertImage.objects.create(image=img_file, advert=advert)
